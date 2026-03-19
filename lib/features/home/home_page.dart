@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/features/home/hero_carousel.dart';
 import 'package:nordbite/features/home/restaurant_section.dart';
 import 'package:nordbite/providers/providers.dart';
@@ -26,7 +27,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     final location = ref.watch(locationProvider);
     final homeData = ref.watch(homeDataProvider);
 
-    // Show city selector when needed
     if (location.needsCitySelector && !_citySelectorShown) {
       _citySelectorShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -61,13 +61,11 @@ class _HomePageState extends ConsumerState<HomePage> {
       onRefresh: () => ref.read(homeDataProvider.notifier).refresh(),
       color: NordBiteTheme.coral,
       child: ListView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: const EdgeInsets.only(bottom: 48),
         children: [
-          const SizedBox(height: 8),
-          // Hero
+          const SizedBox(height: 12),
           HeroCarousel(restaurants: data.hero),
-          const SizedBox(height: 24),
-          // Category chips
+          const SizedBox(height: 32),
           CategoryChips(
             onSelected: (cat) {
               Navigator.pushNamed(
@@ -77,8 +75,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               );
             },
           ),
-          const SizedBox(height: 28),
-          // Featured sections
+          const SizedBox(height: 36),
           RestaurantSection(
             title: 'Featured Nearby',
             subtitle: 'Popular spots close to you',
@@ -123,15 +120,15 @@ class _HomePageState extends ConsumerState<HomePage> {
             restaurants: data.sections['top_rated'] ?? [],
             onSeeAll: () => _seeAll('top_rated'),
           ),
-          // Attribution
+          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Text(
               'Powered by Foursquare & Geoapify  •  Data © OpenStreetMap contributors',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: GoogleFonts.karla(
                 fontSize: 11,
-                color: NordBiteTheme.charcoal.withValues(alpha: 0.35),
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
               ),
             ),
           ),
@@ -153,9 +150,9 @@ class _HomePageState extends ConsumerState<HomePage> {
       children: const [
         SizedBox(height: 16),
         ShimmerHero(),
-        SizedBox(height: 32),
+        SizedBox(height: 36),
         ShimmerSection(),
-        SizedBox(height: 24),
+        SizedBox(height: 28),
         ShimmerSection(),
       ],
     );
@@ -164,16 +161,24 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget _errorState(String error) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.all(48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.cloud_off_rounded,
-              size: 56,
-              color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: NordBiteTheme.coral.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.cloud_off_rounded,
+                size: 36,
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'Something went wrong',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -184,7 +189,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => ref.read(homeDataProvider.notifier).refresh(),
               icon: const Icon(Icons.refresh_rounded, size: 18),

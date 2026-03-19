@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/theme.dart';
 
 class CategoryChips extends StatelessWidget {
@@ -21,26 +22,79 @@ class CategoryChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final (label, icon) = categories[i];
           final isActive = selected?.toLowerCase() == label.toLowerCase();
-          return FilterChip(
-            avatar: Icon(
-              icon,
-              size: 16,
-              color: isActive ? NordBiteTheme.coral : NordBiteTheme.charcoal,
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => onSelected(label.toLowerCase()),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: isActive ? NordBiteTheme.coral : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color:
+                        isActive
+                            ? NordBiteTheme.coral
+                            : NordBiteTheme.charcoal.withValues(alpha: 0.08),
+                  ),
+                  boxShadow:
+                      isActive
+                          ? [
+                            BoxShadow(
+                              color: NordBiteTheme.coral.withValues(
+                                alpha: 0.25,
+                              ),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                          : [
+                            BoxShadow(
+                              color: NordBiteTheme.charcoal.withValues(
+                                alpha: 0.04,
+                              ),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 16,
+                      color:
+                          isActive
+                              ? Colors.white
+                              : NordBiteTheme.charcoal.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(width: 7),
+                    Text(
+                      label,
+                      style: GoogleFonts.karla(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isActive ? Colors.white : NordBiteTheme.charcoal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            label: Text(label),
-            selected: isActive,
-            onSelected: (_) => onSelected(label.toLowerCase()),
-            selectedColor: NordBiteTheme.coral.withValues(alpha: 0.15),
-            checkmarkColor: NordBiteTheme.coral,
           );
         },
       ),

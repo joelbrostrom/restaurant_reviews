@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/providers/providers.dart';
 import 'package:nordbite/theme.dart';
 import 'package:nordbite/widgets/app_drawer.dart';
@@ -45,10 +46,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   }
 
   void _doSearch() {
-    ref.read(searchProvider.notifier).search(
-          query: _searchController.text.trim().isNotEmpty
-              ? _searchController.text.trim()
-              : null,
+    ref
+        .read(searchProvider.notifier)
+        .search(
+          query:
+              _searchController.text.trim().isNotEmpty
+                  ? _searchController.text.trim()
+                  : null,
           categoryKey: _selectedCategory,
           sortBy: _sortBy,
         );
@@ -77,10 +81,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           Expanded(
             child: Row(
               children: [
-                // Filter sidebar on desktop
                 if (isWide)
-                  SizedBox(
-                    width: 260,
+                  Container(
+                    width: 270,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: NordBiteTheme.charcoal.withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
                     child: _FilterPanel(
                       selectedCategory: _selectedCategory,
                       sortBy: _sortBy,
@@ -97,9 +107,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 Expanded(
                   child: Column(
                     children: [
-                      // Search bar + filters for mobile
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                         child: Row(
                           children: [
                             Expanded(
@@ -108,34 +117,51 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                                 decoration: InputDecoration(
                                   hintText: 'Search restaurants...',
                                   prefixIcon: const Icon(Icons.search_rounded),
-                                  suffixIcon: _searchController.text.isNotEmpty
-                                      ? IconButton(
-                                          icon: const Icon(Icons.clear_rounded),
-                                          onPressed: () {
-                                            _searchController.clear();
-                                            _doSearch();
-                                          },
-                                        )
-                                      : null,
+                                  suffixIcon:
+                                      _searchController.text.isNotEmpty
+                                          ? IconButton(
+                                            icon: const Icon(
+                                              Icons.clear_rounded,
+                                            ),
+                                            onPressed: () {
+                                              _searchController.clear();
+                                              _doSearch();
+                                            },
+                                          )
+                                          : null,
                                 ),
+                                style: GoogleFonts.karla(fontSize: 14),
                                 onSubmitted: (_) => _doSearch(),
                               ),
                             ),
                             if (!isWide) ...[
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(Icons.tune_rounded),
-                                onPressed: () => _showFilterSheet(context),
-                                style: IconButton.styleFrom(
-                                  backgroundColor:
-                                      NordBiteTheme.coral.withValues(alpha: 0.1),
+                              const SizedBox(width: 10),
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => _showFilterSheet(context),
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: NordBiteTheme.coral.withValues(
+                                        alpha: 0.08,
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: const Icon(
+                                      Icons.tune_rounded,
+                                      color: NordBiteTheme.coral,
+                                      size: 20,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ],
                         ),
                       ),
-                      // Category chips
                       CategoryChips(
                         selected: _selectedCategory,
                         onSelected: (cat) {
@@ -146,48 +172,82 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           _doSearch();
                         },
                       ),
-                      const SizedBox(height: 8),
-                      // Sort row
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
                           children: [
                             Text(
                               '${search.results.length} results',
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: GoogleFonts.karla(
+                                fontSize: 13,
+                                color: NordBiteTheme.charcoal.withValues(
+                                  alpha: 0.5,
+                                ),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             const Spacer(),
-                            DropdownButton<String>(
-                              value: _sortBy,
-                              underline: const SizedBox.shrink(),
-                              style: Theme.of(context).textTheme.bodySmall,
-                              items: const [
-                                DropdownMenuItem(
-                                    value: 'RELEVANCE', child: Text('Relevant')),
-                                DropdownMenuItem(
-                                    value: 'DISTANCE', child: Text('Closest')),
-                                DropdownMenuItem(
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: NordBiteTheme.charcoal.withValues(
+                                  alpha: 0.04,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: DropdownButton<String>(
+                                value: _sortBy,
+                                underline: const SizedBox.shrink(),
+                                style: GoogleFonts.karla(
+                                  fontSize: 13,
+                                  color: NordBiteTheme.charcoal,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 18,
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                ),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'RELEVANCE',
+                                    child: Text('Relevant'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'DISTANCE',
+                                    child: Text('Closest'),
+                                  ),
+                                  DropdownMenuItem(
                                     value: 'RATING',
-                                    child: Text('Highest rated')),
-                                DropdownMenuItem(
-                                    value: 'AZ', child: Text('A–Z')),
-                              ],
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setState(() => _sortBy = v);
-                                  _doSearch();
-                                }
-                              },
+                                    child: Text('Highest rated'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'AZ',
+                                    child: Text('A–Z'),
+                                  ),
+                                ],
+                                onChanged: (v) {
+                                  if (v != null) {
+                                    setState(() => _sortBy = v);
+                                    _doSearch();
+                                  }
+                                },
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      // Results
+                      const SizedBox(height: 12),
                       Expanded(
-                        child: search.isLoading
-                            ? _loadingGrid()
-                            : search.results.isEmpty
+                        child:
+                            search.isLoading
+                                ? _loadingGrid()
+                                : search.results.isEmpty
                                 ? _emptyState()
                                 : _resultsGrid(search, isWide),
                       ),
@@ -205,29 +265,30 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget _resultsGrid(SearchState search, bool isWide) {
     final crossAxisCount = isWide ? 3 : 2;
     return GridView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        childAspectRatio: 1.05,
+        childAspectRatio: 0.95,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
       itemCount: search.results.length,
       itemBuilder: (_, i) {
         return RestaurantCard(
-          restaurant: search.results[i],
-          width: double.infinity,
-          height: double.infinity,
-        )
+              restaurant: search.results[i],
+              width: double.infinity,
+              height: double.infinity,
+            )
             .animate()
             .fadeIn(
-              delay: Duration(milliseconds: 50 * (i % 6)),
+              delay: Duration(milliseconds: 40 * (i % 6)),
               duration: const Duration(milliseconds: 350),
             )
             .slideY(
-              begin: 0.05,
-              delay: Duration(milliseconds: 50 * (i % 6)),
+              begin: 0.04,
+              delay: Duration(milliseconds: 40 * (i % 6)),
               duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
             );
       },
     );
@@ -238,32 +299,51 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       padding: const EdgeInsets.all(20),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.05,
+        childAspectRatio: 0.95,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
       itemCount: 6,
-      itemBuilder: (_, _) =>
-          const ShimmerCard(width: double.infinity, height: double.infinity),
+      itemBuilder:
+          (_, _) => const ShimmerCard(
+            width: double.infinity,
+            height: double.infinity,
+          ),
     );
   }
 
   Widget _emptyState() {
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.search_off_rounded,
-              size: 56, color: NordBiteTheme.charcoal.withValues(alpha: 0.25)),
-          const SizedBox(height: 16),
-          Text('No restaurants found',
-              style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(
-            'Try a different search or expand your radius.',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 36,
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.25),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'No restaurants found',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Try a different search or expand your radius.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -271,26 +351,28 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _showFilterSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: NordBiteTheme.warmWhite,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: _FilterPanel(
-          selectedCategory: _selectedCategory,
-          sortBy: _sortBy,
-          onCategoryChanged: (cat) {
-            setState(() => _selectedCategory = cat);
-            _doSearch();
-            Navigator.pop(context);
-          },
-          onSortChanged: (sort) {
-            setState(() => _sortBy = sort);
-            _doSearch();
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      builder:
+          (_) => Padding(
+            padding: const EdgeInsets.all(28),
+            child: _FilterPanel(
+              selectedCategory: _selectedCategory,
+              sortBy: _sortBy,
+              onCategoryChanged: (cat) {
+                setState(() => _selectedCategory = cat);
+                _doSearch();
+                Navigator.pop(context);
+              },
+              onSortChanged: (sort) {
+                setState(() => _sortBy = sort);
+                _doSearch();
+                Navigator.pop(context);
+              },
+            ),
+          ),
     );
   }
 }
@@ -314,8 +396,15 @@ class _FilterPanel extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Categories', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 8),
+        Text(
+          'Categories',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: NordBiteTheme.charcoal,
+          ),
+        ),
+        const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -328,9 +417,16 @@ class _FilterPanel extends StatelessWidget {
             _filterChip('Coffee', 'coffee'),
           ],
         ),
-        const SizedBox(height: 20),
-        Text('Sort by', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 8),
+        const SizedBox(height: 24),
+        Text(
+          'Sort by',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: NordBiteTheme.charcoal,
+          ),
+        ),
+        const SizedBox(height: 12),
         ...['RELEVANCE', 'DISTANCE', 'RATING', 'AZ'].map((s) {
           final labels = {
             'RELEVANCE': 'Most relevant',
@@ -338,16 +434,60 @@ class _FilterPanel extends StatelessWidget {
             'RATING': 'Highest rated',
             'AZ': 'A–Z',
           };
+          final icons = {
+            'RELEVANCE': Icons.auto_awesome_rounded,
+            'DISTANCE': Icons.near_me_rounded,
+            'RATING': Icons.star_rounded,
+            'AZ': Icons.sort_by_alpha_rounded,
+          };
           final isSelected = sortBy == s;
-          return ListTile(
-            leading: Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-              color: isSelected ? NordBiteTheme.coral : null,
-              size: 20,
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 2),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSortChanged(s),
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        icons[s],
+                        size: 18,
+                        color:
+                            isSelected
+                                ? NordBiteTheme.coral
+                                : NordBiteTheme.charcoal.withValues(alpha: 0.4),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        labels[s]!,
+                        style: GoogleFonts.karla(
+                          fontSize: 14,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color:
+                              isSelected
+                                  ? NordBiteTheme.coral
+                                  : NordBiteTheme.charcoal,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (isSelected)
+                        Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: NordBiteTheme.coral,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-            title: Text(labels[s]!, style: const TextStyle(fontSize: 14)),
-            dense: true,
-            onTap: () => onSortChanged(s),
           );
         }),
       ],
@@ -355,13 +495,34 @@ class _FilterPanel extends StatelessWidget {
   }
 
   Widget _filterChip(String label, String key) {
-    return FilterChip(
-      label: Text(label),
-      selected: selectedCategory == key,
-      onSelected: (_) =>
-          onCategoryChanged(selectedCategory == key ? null : key),
-      selectedColor: NordBiteTheme.coral.withValues(alpha: 0.15),
-      checkmarkColor: NordBiteTheme.coral,
+    final isActive = selectedCategory == key;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => onCategoryChanged(selectedCategory == key ? null : key),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: isActive ? NordBiteTheme.coral : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color:
+                  isActive
+                      ? NordBiteTheme.coral
+                      : NordBiteTheme.charcoal.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.karla(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: isActive ? Colors.white : NordBiteTheme.charcoal,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

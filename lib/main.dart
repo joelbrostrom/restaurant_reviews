@@ -89,9 +89,22 @@ class NordBiteApp extends StatelessWidget {
     return PageRouteBuilder(
       pageBuilder: (_, _, _) => page,
       transitionsBuilder: (_, animation, _, child) {
-        return FadeTransition(opacity: animation, child: child);
+        final curved = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.02),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        );
       },
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 350),
     );
   }
 }

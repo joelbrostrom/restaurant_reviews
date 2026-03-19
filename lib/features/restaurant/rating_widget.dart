@@ -18,7 +18,7 @@ class RatingWidget extends ConsumerWidget {
     final ratingAsync = ref.watch(userRatingProvider((restaurantId, provider)));
 
     return ratingAsync.when(
-      loading: () => const SizedBox(height: 40),
+      loading: () => const SizedBox(height: 44),
       error: (_, _) => const Text('Could not load rating'),
       data: (currentRating) {
         return _StarRow(
@@ -69,37 +69,46 @@ class _StarRowState extends State<_StarRow> {
   Widget build(BuildContext context) {
     final displayRating = _hoverRating > 0 ? _hoverRating : _selectedRating;
 
-    return Row(
-      children: List.generate(5, (i) {
-        final starValue = i + 1;
-        return MouseRegion(
-          onEnter: (_) => setState(() => _hoverRating = starValue),
-          onExit: (_) => setState(() => _hoverRating = 0),
-          child: GestureDetector(
-            onTap: () async {
-              setState(() => _selectedRating = starValue);
-              await widget.onRate(starValue);
-            },
-            child: AnimatedScale(
-              scale: displayRating >= starValue ? 1.15 : 1.0,
-              duration: const Duration(milliseconds: 150),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Icon(
-                  displayRating >= starValue
-                      ? Icons.star_rounded
-                      : Icons.star_border_rounded,
-                  size: 36,
-                  color:
-                      displayRating >= starValue
-                          ? NordBiteTheme.gold
-                          : NordBiteTheme.charcoal.withValues(alpha: 0.2),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: NordBiteTheme.gold.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: NordBiteTheme.gold.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(5, (i) {
+          final starValue = i + 1;
+          final isActive = displayRating >= starValue;
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _hoverRating = starValue),
+            onExit: (_) => setState(() => _hoverRating = 0),
+            child: GestureDetector(
+              onTap: () async {
+                setState(() => _selectedRating = starValue);
+                await widget.onRate(starValue);
+              },
+              child: AnimatedScale(
+                scale: isActive ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 150),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Icon(
+                    isActive ? Icons.star_rounded : Icons.star_border_rounded,
+                    size: 38,
+                    color:
+                        isActive
+                            ? NordBiteTheme.gold
+                            : NordBiteTheme.charcoal.withValues(alpha: 0.15),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
+      ),
     );
   }
 }

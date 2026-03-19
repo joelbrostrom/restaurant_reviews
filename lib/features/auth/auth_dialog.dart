@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/providers/providers.dart';
 import 'package:nordbite/theme.dart';
 
@@ -16,6 +17,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _passwordController = TextEditingController();
   String? _error;
   bool _loading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -27,12 +29,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NordBiteTheme.cream,
+      backgroundColor: NordBiteTheme.warmWhite,
       body: Center(
         child: SingleChildScrollView(
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
+              constraints: const BoxConstraints(maxWidth: 440),
               child: Padding(
                 padding: const EdgeInsets.all(32),
                 child: Column(
@@ -41,28 +43,35 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     // Logo
                     Text(
                       'NordBite',
-                      style: Theme.of(context).textTheme.displayMedium
-                          ?.copyWith(color: NordBiteTheme.coral),
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 44,
+                        fontWeight: FontWeight.w900,
+                        color: NordBiteTheme.coral,
+                        letterSpacing: -0.5,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       _isSignUp ? 'Create your account' : 'Welcome back',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: GoogleFonts.karla(
+                        fontSize: 16,
+                        color: NordBiteTheme.charcoal.withValues(alpha: 0.6),
+                      ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 36),
                     // Card
                     Container(
-                      padding: const EdgeInsets.all(28),
+                      padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
                             color: NordBiteTheme.charcoal.withValues(
                               alpha: 0.06,
                             ),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
+                            blurRadius: 32,
+                            offset: const Offset(0, 12),
                           ),
                         ],
                       ),
@@ -71,9 +80,13 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         children: [
                           Text(
                             _isSignUp ? 'Sign Up' : 'Sign In',
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: NordBiteTheme.charcoal,
+                            ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                           TextField(
                             controller: _emailController,
                             decoration: const InputDecoration(
@@ -81,24 +94,44 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               prefixIcon: Icon(Icons.email_outlined),
                             ),
                             keyboardType: TextInputType.emailAddress,
+                            style: GoogleFonts.karla(fontSize: 15),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 16),
                           TextField(
                             controller: _passwordController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline_rounded),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline_rounded,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  size: 20,
+                                ),
+                                onPressed:
+                                    () => setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    ),
+                              ),
                             ),
-                            obscureText: true,
+                            obscureText: _obscurePassword,
+                            style: GoogleFonts.karla(fontSize: 15),
                             onSubmitted: (_) => _submit(),
                           ),
                           if (_error != null) ...[
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.red.withValues(alpha: 0.06),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: Colors.red.withValues(alpha: 0.12),
+                                ),
                               ),
                               child: Row(
                                 children: [
@@ -107,13 +140,14 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                     size: 18,
                                     color: Colors.red,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       _error!,
-                                      style: const TextStyle(
+                                      style: GoogleFonts.karla(
                                         color: Colors.red,
                                         fontSize: 13,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -121,9 +155,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               ),
                             ),
                           ],
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 24),
                           SizedBox(
-                            height: 48,
+                            height: 52,
                             child: ElevatedButton(
                               onPressed: _loading ? null : _submit,
                               child:
@@ -143,7 +177,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                       ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -151,7 +185,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                 _isSignUp
                                     ? 'Already have an account?'
                                     : 'Don\'t have an account?',
-                                style: Theme.of(context).textTheme.bodySmall,
+                                style: GoogleFonts.karla(
+                                  fontSize: 13,
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed:
@@ -161,8 +200,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                     }),
                                 child: Text(
                                   _isSignUp ? 'Sign In' : 'Sign Up',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
+                                  style: GoogleFonts.karla(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
                                   ),
                                 ),
                               ),
@@ -171,10 +211,16 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Continue without signing in'),
+                      child: Text(
+                        'Continue without signing in',
+                        style: GoogleFonts.karla(
+                          fontSize: 14,
+                          color: NordBiteTheme.charcoal.withValues(alpha: 0.5),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -225,15 +271,18 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   }
 
   String _friendlyError(String error) {
-    if (error.contains('user-not-found'))
+    if (error.contains('user-not-found')) {
       return 'No account found with this email';
+    }
     if (error.contains('wrong-password')) return 'Incorrect password';
-    if (error.contains('email-already-in-use'))
+    if (error.contains('email-already-in-use')) {
       return 'An account already exists with this email';
+    }
     if (error.contains('invalid-email')) return 'Please enter a valid email';
     if (error.contains('weak-password')) return 'Password is too weak';
-    if (error.contains('network'))
+    if (error.contains('network')) {
       return 'Network error — check your connection';
+    }
     return 'Something went wrong. Please try again.';
   }
 }

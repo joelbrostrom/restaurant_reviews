@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/features/restaurant/image_carousel.dart';
 import 'package:nordbite/features/restaurant/rating_widget.dart';
 import 'package:nordbite/models/restaurant.dart';
@@ -33,8 +34,9 @@ class RestaurantDetailPage extends ConsumerWidget {
         loading: () => _loading(context),
         error: (e, _) => _error(context, e.toString()),
         data: (restaurant) {
-          if (restaurant == null)
+          if (restaurant == null) {
             return _error(context, 'Restaurant not found');
+          }
           return _content(context, ref, restaurant);
         },
       ),
@@ -46,37 +48,21 @@ class RestaurantDetailPage extends ConsumerWidget {
     final isSignedIn = auth.value != null;
     return CustomScrollView(
       slivers: [
-        // Back button
         SliverToBoxAdapter(
           child: SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.arrow_back_rounded, size: 20),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  _BackButton(onTap: () => Navigator.pop(context)),
                   const Spacer(),
                   Text(
                     'NordBite',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: NordBiteTheme.coral,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
+                      color: NordBiteTheme.coral,
                     ),
                   ),
                   const Spacer(),
@@ -86,7 +72,6 @@ class RestaurantDetailPage extends ConsumerWidget {
             ),
           ),
         ),
-        // Image carousel
         SliverToBoxAdapter(
           child:
               r.hasPhotos
@@ -96,51 +81,65 @@ class RestaurantDetailPage extends ConsumerWidget {
                   )
                   : _fallbackHero(r),
         ),
-        // Content
         SliverToBoxAdapter(
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name + category
                     Text(
                       r.name,
                       style: Theme.of(context).textTheme.displaySmall,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,
-                      runSpacing: 4,
+                      runSpacing: 6,
                       children:
                           r.categories.map((c) {
-                            return Chip(
-                              label: Text(
-                                c,
-                                style: const TextStyle(fontSize: 12),
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
                               ),
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
+                              decoration: BoxDecoration(
+                                color: NordBiteTheme.charcoal.withValues(
+                                  alpha: 0.05,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                c,
+                                style: GoogleFonts.karla(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.7,
+                                  ),
+                                ),
+                              ),
                             );
                           }).toList(),
                     ),
-                    const SizedBox(height: 16),
-                    // Rating + distance row
-                    Row(
+                    const SizedBox(height: 20),
+                    // Rating + distance + open status
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 10,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        if (r.hasRating) ...[
+                        if (r.hasRating)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
+                              horizontal: 14,
+                              vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: NordBiteTheme.gold.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              color: NordBiteTheme.gold.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -150,19 +149,20 @@ class RestaurantDetailPage extends ConsumerWidget {
                                   size: 18,
                                   color: NordBiteTheme.gold,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 5),
                                 Text(
                                   r.displayRating.toStringAsFixed(1),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
+                                  style: GoogleFonts.karla(
+                                    fontWeight: FontWeight.w800,
                                     fontSize: 15,
+                                    color: NordBiteTheme.charcoal,
                                   ),
                                 ),
                                 if (r.reviewCount != null) ...[
                                   const SizedBox(width: 4),
                                   Text(
                                     '(${r.reviewCount})',
-                                    style: TextStyle(
+                                    style: GoogleFonts.karla(
                                       fontSize: 12,
                                       color: NordBiteTheme.charcoal.withValues(
                                         alpha: 0.5,
@@ -173,53 +173,76 @@ class RestaurantDetailPage extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                        ],
-                        if (r.distanceLabel.isNotEmpty) ...[
-                          Icon(
-                            Icons.near_me_rounded,
-                            size: 16,
-                            color: NordBiteTheme.charcoal.withValues(
-                              alpha: 0.5,
-                            ),
+                        if (r.distanceLabel.isNotEmpty)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.near_me_rounded,
+                                size: 16,
+                                color: NordBiteTheme.charcoal.withValues(
+                                  alpha: 0.45,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                r.distanceLabel,
+                                style: GoogleFonts.karla(
+                                  fontSize: 14,
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            r.distanceLabel,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(width: 12),
-                        ],
                         if (r.isOpenNow != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color:
                                   r.isOpenNow!
                                       ? NordBiteTheme.basilGreen.withValues(
-                                        alpha: 0.15,
+                                        alpha: 0.1,
                                       )
-                                      : Colors.red.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                                      : Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(
-                              r.isOpenNow! ? 'Open now' : 'Closed',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color:
-                                    r.isOpenNow!
-                                        ? NordBiteTheme.basilGreen
-                                        : Colors.red,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        r.isOpenNow!
+                                            ? NordBiteTheme.basilGreen
+                                            : Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  r.isOpenNow! ? 'Open now' : 'Closed',
+                                  style: GoogleFonts.karla(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color:
+                                        r.isOpenNow!
+                                            ? NordBiteTheme.basilGreen
+                                            : Colors.red,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                     // Action buttons
                     Wrap(
                       spacing: 12,
@@ -240,64 +263,75 @@ class RestaurantDetailPage extends ConsumerWidget {
                         if (isSignedIn) _FavoriteActionButton(restaurant: r),
                       ],
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 32),
                     // Description
                     if (r.description != null && r.description!.isNotEmpty) ...[
-                      Text(
-                        'About',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
+                      _SectionTitle(title: 'About'),
+                      const SizedBox(height: 10),
                       Text(
                         r.description!,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                     ],
                     // Opening hours
                     if (r.openingHours != null &&
                         r.openingHours!.isNotEmpty) ...[
-                      Text(
-                        'Opening Hours',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
+                      _SectionTitle(title: 'Opening Hours'),
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: NordBiteTheme.softGray,
-                          borderRadius: BorderRadius.circular(12),
+                          color: NordBiteTheme.charcoal.withValues(alpha: 0.03),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: NordBiteTheme.charcoal.withValues(
+                              alpha: 0.06,
+                            ),
+                          ),
                         ),
                         child: Text(
                           r.openingHours!,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                     ],
                     // Address
                     if (r.addressLine1 != null || r.addressLine2 != null) ...[
-                      Text(
-                        'Location',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
+                      _SectionTitle(title: 'Location'),
+                      const SizedBox(height: 10),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: NordBiteTheme.softGray,
-                          borderRadius: BorderRadius.circular(12),
+                          color: NordBiteTheme.charcoal.withValues(alpha: 0.03),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: NordBiteTheme.charcoal.withValues(
+                              alpha: 0.06,
+                            ),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            Icon(
-                              Icons.location_on_rounded,
-                              color: NordBiteTheme.coral,
-                              size: 20,
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: NordBiteTheme.coral.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.location_on_rounded,
+                                color: NordBiteTheme.coral,
+                                size: 20,
+                              ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Text(
                                 r.addressLine2 ?? r.addressLine1 ?? '',
@@ -307,35 +341,39 @@ class RestaurantDetailPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                     ],
                     // User rating
                     if (isSignedIn) ...[
-                      Text(
-                        'Your Rating',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
+                      _SectionTitle(title: 'Your Rating'),
+                      const SizedBox(height: 10),
                       RatingWidget(
                         restaurantId: restaurantId,
                         provider: provider,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                     ] else ...[
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: NordBiteTheme.coral.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(16),
+                          color: NordBiteTheme.coral.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: NordBiteTheme.coral.withValues(alpha: 0.1),
+                          ),
                         ),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               'Sign in to rate this restaurant',
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                              style: GoogleFonts.karla(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                color: NordBiteTheme.charcoal,
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                             ElevatedButton(
                               onPressed:
                                   () => Navigator.pushNamed(context, '/auth'),
@@ -344,19 +382,19 @@ class RestaurantDetailPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                     ],
                     // Attribution
                     Text(
                       r.sourceProvider == 'foursquare'
                           ? 'Powered by Foursquare'
                           : 'Data by Geoapify • © OpenStreetMap contributors',
-                      style: TextStyle(
+                      style: GoogleFonts.karla(
                         fontSize: 11,
-                        color: NordBiteTheme.charcoal.withValues(alpha: 0.35),
+                        color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 48),
                   ],
                 ),
               ),
@@ -369,20 +407,20 @@ class RestaurantDetailPage extends ConsumerWidget {
 
   Widget _fallbackHero(Restaurant r) {
     return Container(
-      height: 280,
+      height: 300,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
       child: CachedNetworkImage(
         imageUrl: r.unsplashImageUrl(width: 800, height: 500),
         fit: BoxFit.cover,
         width: double.infinity,
-        height: 280,
+        height: 300,
         placeholder:
             (_, _) => Shimmer.fromColors(
-              baseColor: NordBiteTheme.softGray,
+              baseColor: const Color(0xFFF3F0ED),
               highlightColor: Colors.white,
-              child: Container(color: NordBiteTheme.softGray),
+              child: Container(color: const Color(0xFFF3F0ED)),
             ),
         errorWidget:
             (_, _, _) => Container(
@@ -391,8 +429,8 @@ class RestaurantDetailPage extends ConsumerWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    NordBiteTheme.coral.withValues(alpha: 0.2),
-                    NordBiteTheme.basilGreen.withValues(alpha: 0.1),
+                    NordBiteTheme.coral.withValues(alpha: 0.15),
+                    NordBiteTheme.basilGreen.withValues(alpha: 0.08),
                   ],
                 ),
               ),
@@ -400,7 +438,7 @@ class RestaurantDetailPage extends ConsumerWidget {
                 child: Icon(
                   Icons.restaurant_rounded,
                   size: 56,
-                  color: NordBiteTheme.coral.withValues(alpha: 0.4),
+                  color: NordBiteTheme.coral.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -414,14 +452,14 @@ class RestaurantDetailPage extends ConsumerWidget {
         children: [
           const SizedBox(height: 60),
           Shimmer.fromColors(
-            baseColor: NordBiteTheme.softGray,
+            baseColor: const Color(0xFFF3F0ED),
             highlightColor: Colors.white,
             child: Container(
-              height: 280,
+              height: 300,
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: NordBiteTheme.softGray,
-                borderRadius: BorderRadius.circular(24),
+                color: const Color(0xFFF3F0ED),
+                borderRadius: BorderRadius.circular(28),
               ),
             ),
           ),
@@ -431,27 +469,27 @@ class RestaurantDetailPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Shimmer.fromColors(
-                  baseColor: NordBiteTheme.softGray,
+                  baseColor: const Color(0xFFF3F0ED),
                   highlightColor: Colors.white,
                   child: Container(
-                    width: 200,
-                    height: 32,
+                    width: 220,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: NordBiteTheme.softGray,
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFF3F0ED),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 Shimmer.fromColors(
-                  baseColor: NordBiteTheme.softGray,
+                  baseColor: const Color(0xFFF3F0ED),
                   highlightColor: Colors.white,
                   child: Container(
                     width: double.infinity,
                     height: 60,
                     decoration: BoxDecoration(
-                      color: NordBiteTheme.softGray,
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFF3F0ED),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
@@ -466,16 +504,24 @@ class RestaurantDetailPage extends ConsumerWidget {
   Widget _error(BuildContext context, String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.all(48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.error_outline_rounded,
-              size: 56,
-              color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: NordBiteTheme.coral.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               'Couldn\'t load restaurant',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -486,7 +532,7 @@ class RestaurantDetailPage extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Go Back'),
@@ -502,6 +548,55 @@ class RestaurantDetailPage extends ConsumerWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _BackButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.08),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.arrow_back_rounded, size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: GoogleFonts.playfairDisplay(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: NordBiteTheme.charcoal,
+      ),
+    );
   }
 }
 
@@ -530,11 +625,12 @@ class _FavoriteActionButtonState extends ConsumerState<_FavoriteActionButton> {
       widget.restaurant.id,
       widget.restaurant.sourceProvider,
     );
-    if (mounted)
+    if (mounted) {
       setState(() {
         _isFav = fav;
         _loaded = true;
       });
+    }
   }
 
   @override

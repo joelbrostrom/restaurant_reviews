@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nordbite/providers/providers.dart';
 import 'package:nordbite/theme.dart';
 import 'package:nordbite/widgets/app_drawer.dart';
@@ -57,45 +58,72 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   ) {
     final isWide = MediaQuery.of(context).size.width > 700;
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(20),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isWide ? 3 : 2,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: favorites.length,
-      itemBuilder: (_, i) {
-        final fav = favorites[i];
-        return _FavoriteCard(favorite: fav)
-            .animate()
-            .fadeIn(
-              delay: Duration(milliseconds: 60 * i),
-              duration: const Duration(milliseconds: 350),
-            )
-            .slideY(
-              begin: 0.05,
-              delay: Duration(milliseconds: 60 * i),
-              duration: const Duration(milliseconds: 350),
-            );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+          child: Text(
+            'My Favorites',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: NordBiteTheme.charcoal,
+            ),
+          ),
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: isWide ? 3 : 2,
+              childAspectRatio: 0.82,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+            ),
+            itemCount: favorites.length,
+            itemBuilder: (_, i) {
+              final fav = favorites[i];
+              return _FavoriteCard(favorite: fav)
+                  .animate()
+                  .fadeIn(
+                    delay: Duration(milliseconds: 50 * i),
+                    duration: const Duration(milliseconds: 350),
+                  )
+                  .slideY(
+                    begin: 0.04,
+                    delay: Duration(milliseconds: 50 * i),
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeOut,
+                  );
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _emptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.all(48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.favorite_border_rounded,
-              size: 64,
-              color: NordBiteTheme.coral.withValues(alpha: 0.3),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: NordBiteTheme.coral.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.favorite_border_rounded,
+                size: 40,
+                color: NordBiteTheme.coral.withValues(alpha: 0.4),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'No favorites yet',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -106,7 +134,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed:
                   () => Navigator.pushNamedAndRemoveUntil(
@@ -126,27 +154,35 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   Widget _signInPrompt(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40),
+        padding: const EdgeInsets.all(48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.lock_outline_rounded,
-              size: 56,
-              color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.lock_outline_rounded,
+                size: 36,
+                color: NordBiteTheme.charcoal.withValues(alpha: 0.3),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               'Sign in to see favorites',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Create an account to save and manage your favorite restaurants.',
+              'Create an account to save and manage\nyour favorite restaurants.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/auth'),
               child: const Text('Sign In'),
@@ -158,109 +194,162 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   }
 }
 
-class _FavoriteCard extends ConsumerWidget {
+class _FavoriteCard extends ConsumerStatefulWidget {
   final Map<String, dynamic> favorite;
 
   const _FavoriteCard({required this.favorite});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final name = favorite['restaurantName'] as String? ?? 'Restaurant';
-    final city = favorite['cachedCity'] as String?;
-    final imageUrl = favorite['cachedImageUrl'] as String?;
-    final restaurantId = favorite['restaurantId'] as String? ?? '';
-    final provider = favorite['provider'] as String? ?? 'foursquare';
+  ConsumerState<_FavoriteCard> createState() => _FavoriteCardState();
+}
 
-    return GestureDetector(
-      onTap:
-          () => Navigator.pushNamed(
-            context,
-            '/restaurant',
-            arguments: {'id': restaurantId, 'provider': provider, 'name': name},
+class _FavoriteCardState extends ConsumerState<_FavoriteCard> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = widget.favorite['restaurantName'] as String? ?? 'Restaurant';
+    final city = widget.favorite['cachedCity'] as String?;
+    final imageUrl = widget.favorite['cachedImageUrl'] as String?;
+    final restaurantId = widget.favorite['restaurantId'] as String? ?? '';
+    final provider = widget.favorite['provider'] as String? ?? 'foursquare';
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onTap:
+            () => Navigator.pushNamed(
+              context,
+              '/restaurant',
+              arguments: {
+                'id': restaurantId,
+                'provider': provider,
+                'name': name,
+              },
+            ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          transform: Matrix4.translationValues(0, _hovering ? -4 : 0, 0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: NordBiteTheme.charcoal.withValues(
+                  alpha: _hovering ? 0.12 : 0.06,
+                ),
+                blurRadius: _hovering ? 20 : 10,
+                offset: Offset(0, _hovering ? 8 : 4),
+              ),
+            ],
           ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: NordBiteTheme.charcoal.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child:
-                  imageUrl != null && imageUrl.isNotEmpty
-                      ? CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorWidget: (_, _, _) => _placeholder(),
-                      )
-                      : _placeholder(),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 3,
+                child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const Spacer(),
-                    if (city != null)
-                      Text(
-                        city,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: NordBiteTheme.charcoal.withValues(alpha: 0.5),
+                    imageUrl != null && imageUrl.isNotEmpty
+                        ? CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          errorWidget: (_, _, _) => _placeholder(),
+                        )
+                        : _placeholder(),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 40,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.2),
+                            ],
+                          ),
                         ),
-                      ),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () async {
-                        final firebase = ref.read(firebaseServiceProvider);
-                        await firebase.removeFavorite(restaurantId, provider);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.favorite_rounded,
-                            size: 14,
-                            color: NordBiteTheme.coral,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Remove',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: NordBiteTheme.coral,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.playfairDisplay(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: NordBiteTheme.charcoal,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (city != null)
+                        Text(
+                          city,
+                          style: GoogleFonts.karla(
+                            fontSize: 12,
+                            color: NordBiteTheme.charcoal.withValues(
+                              alpha: 0.5,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 6),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final firebase = ref.read(firebaseServiceProvider);
+                            await firebase.removeFavorite(
+                              restaurantId,
+                              provider,
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.favorite_rounded,
+                                size: 14,
+                                color: NordBiteTheme.coral,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Remove',
+                                style: GoogleFonts.karla(
+                                  fontSize: 12,
+                                  color: NordBiteTheme.coral,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -273,8 +362,8 @@ class _FavoriteCard extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            NordBiteTheme.coral.withValues(alpha: 0.15),
-            NordBiteTheme.basilGreen.withValues(alpha: 0.1),
+            NordBiteTheme.coral.withValues(alpha: 0.12),
+            NordBiteTheme.basilGreen.withValues(alpha: 0.08),
           ],
         ),
       ),
@@ -282,7 +371,7 @@ class _FavoriteCard extends ConsumerWidget {
         child: Icon(
           Icons.restaurant_rounded,
           size: 32,
-          color: NordBiteTheme.coral.withValues(alpha: 0.4),
+          color: NordBiteTheme.coral.withValues(alpha: 0.3),
         ),
       ),
     );
