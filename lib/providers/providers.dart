@@ -300,6 +300,9 @@ class SearchNotifier extends Notifier<SearchState> {
           (a, b) =>
               (a.distanceMeters ?? 99999).compareTo(b.distanceMeters ?? 99999),
         );
+      } else if (state.sortBy == 'RATING') {
+        sorted = List.from(results)
+          ..sort((a, b) => b.displayRating.compareTo(a.displayRating));
       } else if (state.sortBy == 'AZ') {
         sorted = List.from(results)..sort((a, b) => a.name.compareTo(b.name));
       }
