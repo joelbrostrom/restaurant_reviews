@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,10 +18,12 @@ class FavoritesPage extends ConsumerStatefulWidget {
 
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _hasAnimated = false;
 
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authStateProvider);
+    final user = auth.value;
     final favoritesAsync = ref.watch(favoritesStreamProvider);
 
     return Scaffold(
@@ -29,27 +32,25 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
       body: Column(
         children: [
           AppHeader(onMenuTap: () => _scaffoldKey.currentState?.openDrawer()),
-          Expanded(
-            child: auth.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, _) => _signInPrompt(context),
-              data: (user) {
-                if (user == null) return _signInPrompt(context);
-                return favoritesAsync.when(
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Error: $e')),
-                  data: (favorites) {
-                    if (favorites.isEmpty) return _emptyState(context);
-                    return _favoritesList(context, favorites);
-                  },
-                );
-              },
-            ),
-          ),
+          Expanded(child: _buildBody(context, user, favoritesAsync)),
         ],
       ),
     );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    User? user,
+    AsyncValue<List<Map<String, dynamic>>> favoritesAsync,
+  ) {
+    if (user == null) return _signInPrompt(context);
+
+    final favorites = favoritesAsync.value;
+    if (favorites == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (favorites.isEmpty) return _emptyState(context);
+    return _favoritesList(context, favorites);
   }
 
   Widget _favoritesList(
@@ -85,8 +86,10 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
             itemCount: favorites.length,
             itemBuilder: (_, i) {
               final fav = favorites[i];
-              return _FavoriteCard(favorite: fav)
-                  .animate()
+              final card = _FavoriteCard(favorite: fav);
+              if (_hasAnimated) return card;
+              return card
+                  .animate(onComplete: (_) => _hasAnimated = true)
                   .fadeIn(
                     delay: Duration(milliseconds: 50 * i),
                     duration: const Duration(milliseconds: 350),

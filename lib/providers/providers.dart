@@ -339,8 +339,19 @@ final favoritesStreamProvider = StreamProvider<List<Map<String, dynamic>>>((
   ref,
 ) {
   final firebase = ref.read(firebaseServiceProvider);
-  final auth = ref.watch(authStateProvider);
-  if (auth.value == null) return Stream.value([]);
+
+  // Invalidate when the signed-in user actually changes (sign-in / sign-out),
+  // but don't rebuild on every auth stream tick (which causes load-flicker).
+  String? lastUid = firebase.currentUser?.uid;
+  ref.listen(authStateProvider, (prev, next) {
+    final newUid = next.value?.uid;
+    if (newUid != lastUid) {
+      lastUid = newUid;
+      ref.invalidateSelf();
+    }
+  });
+
+  if (!firebase.isSignedIn) return Stream.value([]);
   return firebase.watchFavorites();
 });
 
@@ -350,8 +361,16 @@ final isFavoriteProvider = FutureProvider.family<bool, (String, String)>((
 ) async {
   final (restaurantId, provider) = params;
   final firebase = ref.read(firebaseServiceProvider);
-  final auth = ref.watch(authStateProvider);
-  if (auth.value == null) return false;
+
+  String? lastUid = firebase.currentUser?.uid;
+  ref.listen(authStateProvider, (prev, next) {
+    if (next.value?.uid != lastUid) {
+      lastUid = next.value?.uid;
+      ref.invalidateSelf();
+    }
+  });
+
+  if (!firebase.isSignedIn) return false;
   return await firebase.isFavorite(restaurantId, provider);
 });
 
@@ -363,7 +382,15 @@ final userRatingProvider = StreamProvider.family<int?, (String, String)>((
 ) {
   final (restaurantId, provider) = params;
   final firebase = ref.read(firebaseServiceProvider);
-  final auth = ref.watch(authStateProvider);
-  if (auth.value == null) return Stream.value(null);
+
+  String? lastUid = firebase.currentUser?.uid;
+  ref.listen(authStateProvider, (prev, next) {
+    if (next.value?.uid != lastUid) {
+      lastUid = next.value?.uid;
+      ref.invalidateSelf();
+    }
+  });
+
+  if (!firebase.isSignedIn) return Stream.value(null);
   return firebase.watchUserRating(restaurantId, provider);
 });
