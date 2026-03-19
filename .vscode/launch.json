@@ -2,18 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Flutter Web",
+      "name": "NordBite Web",
       "type": "dart",
       "request": "launch",
       "program": "lib/main.dart",
-      "args": ["-d", "chrome"]
+      "args": [
+        "-d", "chrome",
+        "--web-browser-flag=--disable-web-security",
+        "--dart-define=FOURSQUARE_API_KEY=R01RBUHGLPWWFHR1D1KC2LXCIPHXRFLOX31C1LSTQG5GK1CI",
+        "--dart-define=GEOAPIFY_API_KEY=6334b2436c02419f82b70457f8244e82"
+      ]
     },
     {
-      "name": "Flutter Web (Edge)",
+      "name": "NordBite Web (Edge)",
       "type": "dart",
       "request": "launch",
       "program": "lib/main.dart",
-      "args": ["-d", "edge"]
+      "args": [
+        "-d", "edge",
+        "--dart-define=FOURSQUARE_API_KEY=R01RBUHGLPWWFHR1D1KC2LXCIPHXRFLOX31C1LSTQG5GK1CI",
+        "--dart-define=GEOAPIFY_API_KEY=6334b2436c02419f82b70457f8244e82"
+      ]
     }
   ]
 }

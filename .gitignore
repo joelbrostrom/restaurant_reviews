@@ -120,3 +120,5 @@ app.*.symbols
 
 # VS Code
 .vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
