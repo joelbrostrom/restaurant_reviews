@@ -110,10 +110,11 @@ class RestaurantSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 290,
+            height: 310,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               itemCount: restaurants.length,
               separatorBuilder: (_, _) => const SizedBox(width: 16),
               itemBuilder: (_, i) {

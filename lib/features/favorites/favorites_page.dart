@@ -74,6 +74,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
         ),
         Expanded(
           child: GridView.builder(
+            clipBehavior: Clip.none,
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isWide ? 3 : 2,

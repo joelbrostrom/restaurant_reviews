@@ -52,6 +52,28 @@ class FirebaseService {
     }
   }
 
+  Future<UserCredential> signInWithGoogle() async {
+    Log.d(_tag, 'Signing in with Google');
+    try {
+      final provider = GoogleAuthProvider();
+      final cred = await _auth.signInWithPopup(provider);
+      if (cred.additionalUserInfo?.isNewUser == true && cred.user != null) {
+        await _db.collection('profiles').doc(cred.user!.uid).set({
+          'email': cred.user!.email,
+          'displayName': cred.user!.displayName,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+        Log.d(_tag, 'New Google user profile created: ${cred.user!.uid}');
+      }
+      Log.d(_tag, 'Google sign-in complete for ${cred.user?.uid}');
+      return cred;
+    } catch (e, stack) {
+      Log.e(_tag, 'Google sign-in failed', e, stack);
+      rethrow;
+    }
+  }
+
   Future<void> signOut() {
     Log.d(_tag, 'Signing out');
     return _auth.signOut();

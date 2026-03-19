@@ -33,7 +33,7 @@ class ShimmerHero extends StatelessWidget {
       baseColor: const Color(0xFFF3F0ED),
       highlightColor: Colors.white,
       child: Container(
-        height: 420,
+        height: 440,
         margin: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: const Color(0xFFF3F0ED),
@@ -86,10 +86,11 @@ class ShimmerSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 280,
+          height: 300,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            clipBehavior: Clip.none,
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             itemCount: 4,
             separatorBuilder: (_, _) => const SizedBox(width: 16),
             itemBuilder: (_, _) => const ShimmerCard(),

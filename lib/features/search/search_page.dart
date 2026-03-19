@@ -265,7 +265,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   Widget _resultsGrid(SearchState search, bool isWide) {
     final crossAxisCount = isWide ? 3 : 2;
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+      clipBehavior: Clip.none,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
         childAspectRatio: 0.95,
@@ -296,6 +297,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
   Widget _loadingGrid() {
     return GridView.builder(
+      clipBehavior: Clip.none,
       padding: const EdgeInsets.all(20),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

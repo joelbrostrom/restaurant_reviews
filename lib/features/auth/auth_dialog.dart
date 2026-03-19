@@ -17,6 +17,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
   final _passwordController = TextEditingController();
   String? _error;
   bool _loading = false;
+  bool _googleLoading = false;
   bool _obscurePassword = true;
 
   @override
@@ -85,6 +86,88 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               fontWeight: FontWeight.w800,
                               color: NordBiteTheme.charcoal,
                             ),
+                          ),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            height: 52,
+                            child: OutlinedButton.icon(
+                              onPressed:
+                                  (_loading || _googleLoading)
+                                      ? null
+                                      : _signInWithGoogle,
+                              icon:
+                                  _googleLoading
+                                      ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : Image.network(
+                                        'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
+                                        width: 20,
+                                        height: 20,
+                                        errorBuilder:
+                                            (_, _, _) => const Icon(
+                                              Icons.g_mobiledata_rounded,
+                                              size: 24,
+                                            ),
+                                      ),
+                              label: Text(
+                                _isSignUp
+                                    ? 'Continue with Google'
+                                    : 'Sign in with Google',
+                                style: GoogleFonts.karla(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                  color: NordBiteTheme.charcoal,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                child: Text(
+                                  'or',
+                                  style: GoogleFonts.karla(
+                                    fontSize: 13,
+                                    color: NordBiteTheme.charcoal.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 24),
                           TextField(
@@ -232,6 +315,28 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     );
   }
 
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _googleLoading = true;
+      _error = null;
+    });
+
+    try {
+      final firebase = ref.read(firebaseServiceProvider);
+      await firebase.signInWithGoogle();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _googleLoading = false;
+          _error = _friendlyError(e.toString());
+        });
+      }
+    }
+  }
+
   Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -280,6 +385,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     }
     if (error.contains('invalid-email')) return 'Please enter a valid email';
     if (error.contains('weak-password')) return 'Password is too weak';
+    if (error.contains('popup-closed-by-user') || error.contains('cancelled')) {
+      return 'Sign-in was cancelled';
+    }
+    if (error.contains('account-exists-with-different-credential')) {
+      return 'An account already exists with this email using a different sign-in method';
+    }
     if (error.contains('network')) {
       return 'Network error — check your connection';
     }

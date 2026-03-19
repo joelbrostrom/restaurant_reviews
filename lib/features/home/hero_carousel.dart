@@ -54,8 +54,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
     return Column(
       children: [
         SizedBox(
-          height: 420,
+          height: 440,
           child: PageView.builder(
+            clipBehavior: Clip.none,
             controller: _controller,
             itemCount: widget.restaurants.length,
             onPageChanged: (i) => setState(() => _current = i),
