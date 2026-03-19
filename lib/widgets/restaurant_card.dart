@@ -39,11 +39,16 @@ class _RestaurantCardState extends ConsumerState<RestaurantCard> {
       onEnter: (_) => setState(() => _hovering = true),
       onExit: (_) => setState(() => _hovering = false),
       child: GestureDetector(
-        onTap: () => Navigator.pushNamed(
-          context,
-          '/restaurant',
-          arguments: {'id': r.id, 'provider': r.sourceProvider, 'name': r.name},
-        ),
+        onTap:
+            () => Navigator.pushNamed(
+              context,
+              '/restaurant',
+              arguments: {
+                'id': r.id,
+                'provider': r.sourceProvider,
+                'name': r.name,
+              },
+            ),
         child: AnimatedSlide(
           duration: const Duration(milliseconds: 200),
           offset: _hovering ? const Offset(0, -0.02) : Offset.zero,
@@ -76,17 +81,19 @@ class _RestaurantCardState extends ConsumerState<RestaurantCard> {
                       fit: StackFit.expand,
                       children: [
                         CachedNetworkImage(
-                          imageUrl: r.hasPhotos
-                              ? r.firstImageUrl
-                              : r.unsplashImageUrl(),
+                          imageUrl:
+                              r.hasPhotos
+                                  ? r.firstImageUrl
+                                  : r.unsplashImageUrl(),
                           fit: BoxFit.cover,
                           placeholder: (_, _) => _shimmerPlaceholder(),
-                          errorWidget: (_, _, _) => CachedNetworkImage(
-                            imageUrl: r.unsplashImageUrl(),
-                            fit: BoxFit.cover,
-                            placeholder: (_, _) => _shimmerPlaceholder(),
-                            errorWidget: (_, _, _) => _fallbackImage(r),
-                          ),
+                          errorWidget:
+                              (_, _, _) => CachedNetworkImage(
+                                imageUrl: r.unsplashImageUrl(),
+                                fit: BoxFit.cover,
+                                placeholder: (_, _) => _shimmerPlaceholder(),
+                                errorWidget: (_, _, _) => _fallbackImage(r),
+                              ),
                         ),
                         // Gradient overlay
                         Positioned(
@@ -184,13 +191,34 @@ class _RestaurantCardState extends ConsumerState<RestaurantCard> {
                               ),
                               const SizedBox(width: 3),
                               Text(
-                                r.rating!.toStringAsFixed(1),
+                                r.displayRating.toStringAsFixed(1),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 10),
+                            ],
+                            if (r.distanceLabel.isNotEmpty) ...[
+                              Icon(
+                                Icons.near_me_rounded,
+                                size: 13,
+                                color: NordBiteTheme.charcoal.withValues(
+                                  alpha: 0.45,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                r.distanceLabel,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: NordBiteTheme.charcoal.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
                             ],
                             if (r.city != null)
                               Expanded(

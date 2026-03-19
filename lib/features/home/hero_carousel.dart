@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nordbite/models/restaurant.dart';
@@ -133,38 +134,45 @@ class _HeroCard extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             CachedNetworkImage(
-              imageUrl: restaurant.hasPhotos
-                  ? restaurant.firstImageUrl
-                  : restaurant.unsplashImageUrl(width: 800, height: 600),
+              imageUrl:
+                  restaurant.hasPhotos
+                      ? restaurant.firstImageUrl
+                      : restaurant.unsplashImageUrl(width: 800, height: 600),
               fit: BoxFit.cover,
-              placeholder: (_, _) => Shimmer.fromColors(
-                baseColor: NordBiteTheme.softGray,
-                highlightColor: Colors.white,
-                child: Container(color: NordBiteTheme.softGray),
-              ),
-              errorWidget: (_, _, _) => CachedNetworkImage(
-                imageUrl: restaurant.unsplashImageUrl(width: 800, height: 600),
-                fit: BoxFit.cover,
-                errorWidget: (_, _, _) => Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        NordBiteTheme.coral.withValues(alpha: 0.8),
-                        NordBiteTheme.charcoal.withValues(alpha: 0.9),
-                      ],
-                    ),
+              placeholder:
+                  (_, _) => Shimmer.fromColors(
+                    baseColor: NordBiteTheme.softGray,
+                    highlightColor: Colors.white,
+                    child: Container(color: NordBiteTheme.softGray),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.restaurant_rounded,
-                      size: 64,
-                      color: Colors.white24,
+              errorWidget:
+                  (_, _, _) => CachedNetworkImage(
+                    imageUrl: restaurant.unsplashImageUrl(
+                      width: 800,
+                      height: 600,
                     ),
+                    fit: BoxFit.cover,
+                    errorWidget:
+                        (_, _, _) => Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                NordBiteTheme.coral.withValues(alpha: 0.8),
+                                NordBiteTheme.charcoal.withValues(alpha: 0.9),
+                              ],
+                            ),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.restaurant_rounded,
+                              size: 64,
+                              color: Colors.white24,
+                            ),
+                          ),
+                        ),
                   ),
-                ),
-              ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -230,7 +238,7 @@ class _HeroCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          restaurant.rating!.toStringAsFixed(1),
+                          restaurant.displayRating.toStringAsFixed(1),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,

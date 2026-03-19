@@ -88,12 +88,13 @@ class RestaurantDetailPage extends ConsumerWidget {
         ),
         // Image carousel
         SliverToBoxAdapter(
-          child: r.hasPhotos
-              ? ImageCarousel(
-                  imageUrls: r.imageUrls,
-                  fallbackUrl: r.unsplashImageUrl(width: 800, height: 500),
-                )
-              : _fallbackHero(r),
+          child:
+              r.hasPhotos
+                  ? ImageCarousel(
+                    imageUrls: r.imageUrls,
+                    fallbackUrl: r.unsplashImageUrl(width: 800, height: 500),
+                  )
+                  : _fallbackHero(r),
         ),
         // Content
         SliverToBoxAdapter(
@@ -151,7 +152,7 @@ class RestaurantDetailPage extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  r.rating!.toStringAsFixed(1),
+                                  r.displayRating.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
@@ -371,38 +372,38 @@ class RestaurantDetailPage extends ConsumerWidget {
       height: 280,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
       child: CachedNetworkImage(
         imageUrl: r.unsplashImageUrl(width: 800, height: 500),
         fit: BoxFit.cover,
         width: double.infinity,
         height: 280,
-        placeholder: (_, _) => Shimmer.fromColors(
-          baseColor: NordBiteTheme.softGray,
-          highlightColor: Colors.white,
-          child: Container(color: NordBiteTheme.softGray),
-        ),
-        errorWidget: (_, _, _) => Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                NordBiteTheme.coral.withValues(alpha: 0.2),
-                NordBiteTheme.basilGreen.withValues(alpha: 0.1),
-              ],
+        placeholder:
+            (_, _) => Shimmer.fromColors(
+              baseColor: NordBiteTheme.softGray,
+              highlightColor: Colors.white,
+              child: Container(color: NordBiteTheme.softGray),
             ),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.restaurant_rounded,
-              size: 56,
-              color: NordBiteTheme.coral.withValues(alpha: 0.4),
+        errorWidget:
+            (_, _, _) => Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    NordBiteTheme.coral.withValues(alpha: 0.2),
+                    NordBiteTheme.basilGreen.withValues(alpha: 0.1),
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.restaurant_rounded,
+                  size: 56,
+                  color: NordBiteTheme.coral.withValues(alpha: 0.4),
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
